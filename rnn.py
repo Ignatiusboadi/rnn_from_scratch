@@ -14,6 +14,9 @@ class RNN:
         :param l_rate:
         :type l_rate:
         """
+        self.outputs = None
+        self.inputs = None
+        self.hidden_states = None
         self.hidden_size = hidden_size
         self.l_rate = l_rate
         self.input_size = input_size
@@ -25,3 +28,17 @@ class RNN:
 
         self.bh = np.zeros((self.hidden_size, 1))
         self.by = np.zeros((self.output_size, 1))
+
+    def forward(self, inputs):
+        hidden_state = np.zeros((self.hidden_size, 1))
+        self.hidden_states = [hidden_state]
+        self.inputs = inputs
+        self.outputs = []
+        for x in self.inputs:
+            x = x.reshape(-1, 1)
+            hidden_state = np.tanh(self.Wxh @ x + self.Whh @ hidden_state + self.bh)
+            self.hidden_states.append(hidden_state)
+            output = self.Why @ hidden_state + self.by
+            self.outputs.append(output)
+
+        return self.outputs, self.hidden_states[-1]
